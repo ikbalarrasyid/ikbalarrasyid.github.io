@@ -1,177 +1,149 @@
+;(function () {
+	
+	'use strict';
+
+	var isMobile = {
+		Android: function() {
+			return navigator.userAgent.match(/Android/i);
+		},
+			BlackBerry: function() {
+			return navigator.userAgent.match(/BlackBerry/i);
+		},
+			iOS: function() {
+			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+		},
+			Opera: function() {
+			return navigator.userAgent.match(/Opera Mini/i);
+		},
+			Windows: function() {
+			return navigator.userAgent.match(/IEMobile/i);
+		},
+			any: function() {
+			return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+		}
+	};
+
+	
+	var fullHeight = function() {
+
+		if ( !isMobile.any() ) {
+			$('.js-fullheight').css('height', $(window).height());
+			$(window).resize(function(){
+				$('.js-fullheight').css('height', $(window).height());
+			});
+		}
+	};
+
+	// Parallax
+	var parallax = function() {
+		$(window).stellar();
+	};
+
+	var contentWayPoint = function() {
+		var i = 0;
+		$('.animate-box').waypoint( function( direction ) {
+
+			if( direction === 'down' && !$(this.element).hasClass('animated-fast') ) {
+				
+				i++;
+
+				$(this.element).addClass('item-animate');
+				setTimeout(function(){
+
+					$('body .animate-box.item-animate').each(function(k){
+						var el = $(this);
+						setTimeout( function () {
+							var effect = el.data('animate-effect');
+							if ( effect === 'fadeIn') {
+								el.addClass('fadeIn animated-fast');
+							} else if ( effect === 'fadeInLeft') {
+								el.addClass('fadeInLeft animated-fast');
+							} else if ( effect === 'fadeInRight') {
+								el.addClass('fadeInRight animated-fast');
+							} else {
+								el.addClass('fadeInUp animated-fast');
+							}
+
+							el.removeClass('item-animate');
+						},  k * 100, 'easeInOutExpo' );
+					});
+					
+				}, 50);
+				
+			}
+
+		} , { offset: '85%' } );
+	};
 
 
-//Use Strict Mode
-(function($) {
-  "use strict";
 
-//Begin - Window Load
-$(window).load(function(){
+	var goToTop = function() {
 
+		$('.js-gotop').on('click', function(event){
+			
+			event.preventDefault();
 
-	//==============___Page Loader___================
-  
-  $('#page-loader').delay(300).fadeOut(400, function(){
+			$('html, body').animate({
+				scrollTop: $('html').offset().top
+			}, 500, 'easeInOutExpo');
+			
+			return false;
+		});
 
-  });
+		$(window).scroll(function(){
 
-  $('#loader-name').addClass('loader-left');
-  $('#loader-job').addClass('loader-right');
-  $('#loader-animation').addClass('loader-hide');
+			var $win = $(window);
+			if ($win.scrollTop() > 200) {
+				$('.js-top').addClass('active');
+			} else {
+				$('.js-top').removeClass('active');
+			}
 
-});
+		});
+	
+	};
 
-//Begin - Document Ready
-$(document).ready(function(){
+	var pieChart = function() {
+		$('.chart').easyPieChart({
+			scaleColor: false,
+			lineWidth: 4,
+			lineCap: 'butt',
+			barColor: '#FF9000',
+			trackColor:	"#f5f5f5",
+			size: 160,
+			animate: 1000
+		});
+	};
 
-//==============___Page Loader___================
-  $('#loading-wraper').fadeIn(300);
+	var skillsWayPoint = function() {
+		if ($('#fh5co-skills').length > 0 ) {
+			$('#fh5co-skills').waypoint( function( direction ) {
+										
+				if( direction === 'down' && !$(this.element).hasClass('animated') ) {
+					setTimeout( pieChart , 400);					
+					$(this.element).addClass('animated');
+				}
+			} , { offset: '90%' } );
+		}
 
-//==============___Testimonials - owl Carousel___================
- $("#testimonial-carousel").owlCarousel({
-    navigation : false, // Show next and prev buttons
-    slideSpeed : 300,
-    paginationSpeed : 400,      
-    responsiveRefreshRate : 200,
-    responsiveBaseWidth: window,
-    pagination: true,
-    singleItem: true,    
-    navigationText: ["<span class='fa fa-chevron-left'></span>","<span class='fa fa-chevron-right'></span>"],     
-  });
-
-
-//==============_Map_================
-$('.map').on('click', function(){
-	$('.map-overlay').hide();
-});
-
-$('.map').on('mouseleave', function(){
-	$('.map-overlay').show();
-});
-
-//==============_Lightbox_================
-//Nivo Lightbox
-  $('a.nivobox').nivoLightbox({ effect: 'fade' });
-
-
-//==============___Scrollbars___================
-$('.section-vcardbody').perfectScrollbar({
-  wheelSpeed: 0.9
-});
-
-//==============___Menu & Pages Animation___================
-
-var linkHome = 0;
-var linkPage = '';
-
-function pageOn(){
-    $('#main-menu').addClass('main-menu-pgactive');
-    $('#section-home').addClass('section-vcardbody-pgactive');    
-    $('.profileActive').removeClass('profileActive');    
-    $('#profile2').addClass('profileActive');
-    
-    linkHome = 1;
-}
-
-function pageOff(){
-    $('.section-page-active').removeClass('section-page-active');
-    $('#main-menu').removeClass('main-menu-pgactive');
-    $('#section-home').removeClass('section-vcardbody-pgactive');
-    $('.profileActive').removeClass('profileActive');
-    $('#profile1').addClass('profileActive');
-    linkHome = 0;
-}
+	};
 
 
-$(".link-page").on('click', function(event){
-  event.preventDefault();
-  $('.menuActive').removeClass('menuActive');  
-  $(this).addClass('menuActive');
-  linkPage = $(this).attr('href');
-  $('.section-page-active').removeClass('section-page-active');
-  $(linkPage).addClass('section-page-active');
-  pageOn();
-});
+	// Loading page
+	var loaderPage = function() {
+		$(".fh5co-loader").fadeOut("slow");
+	};
+
+	
+	$(function(){
+		contentWayPoint();
+		goToTop();
+		loaderPage();
+		fullHeight();
+		parallax();
+		// pieChart();
+		skillsWayPoint();
+	});
 
 
-$(".link-home").on('click', function(event){
-  event.preventDefault();
-
-  if (linkHome == 0) {
-    //pageOn();
-  }
-  else if (linkHome == 1) {
-    $('.menuActive').removeClass('menuActive');
-    $(this).addClass('menuActive');
-    pageOff();
-  }  
-});
-
-//==============___Blog - Ajax___================
-function loadPost(){
-   $.ajax({
-      url: 'single.html', // URL HERE
-      type: 'GET',
-      success: function(html) {
-
-        var $lis = $(html).find('#blogPost'); // Loads the content inside #blogPost div
-
-        $("#postHere").html($lis);
-    }
-  });
-}
-
-$(".loadPost").on('click', function(event){
-  event.preventDefault();
-  //$("#postHere").html('loading...');
-  $('.section-page-active').removeClass('section-page-active');
-  $('#page-blog-single').addClass('section-page-active');
-  pageOn();
-  loadPost();
-});
-
-//==============___Contact Form Validator and Ajax Sender___================
-  $("#contactForm").validate({
-    submitHandler: function(form) {
-      $.ajax({
-        type: "POST",
-        url: "php/contact-form.php",
-        data: {
-          "name": $("#contactForm #name").val(),
-          "email": $("#contactForm #email").val(),
-          "subject": $("#contactForm #subject").val(),
-          "message": $("#contactForm #message").val()
-        },
-        dataType: "json",
-        success: function (data) {
-          if (data.response == "success") {
-            $("#contactSuccess").fadeIn(300);
-            $("#contactError").addClass("hidden");
-
-            $("#contactForm #name, #contactForm #email, #contactForm #subject, #contactForm #message")
-              .val("")
-              .blur()
-              .closest(".control-group")
-              .removeClass("success")
-              .removeClass("error");              
-            
-          } else {
-            $("#contactError").fadeIn(300);
-            $("#contactSuccess").addClass("hidden");
-          }
-        }
-
-      });
-    }
-  });
-
-
-//Modal for Contact Form
-$('.modal-wrap').click(function(){
-  $('.modal-wrap').fadeOut(300);
-});   
-
-//End - Document Ready
-});
-
-//End - Use Strict mode
-})(jQuery);
+}());
